@@ -1,3 +1,51 @@
 import express from "express";
+import { signupTypes } from "../types/signupTypes";
+import { User } from "../models/userSchema";
+import bcrypt from "bcryptjs"
+import  jwt  from "jsonwebtoken";
 
 export const authRouter = express.Router();
+
+
+authRouter.post("/signup", async(req,res) => {
+  const {success, error} = signupTypes.safeParse(req.body);
+  if(!success){
+    res.status(400).json({ error });
+    return;
+  }
+  try {
+    const user = await User.findOne({
+      email:req.body.email
+    });
+    if(user){
+      res.status(409).json({message:"User already exist!"});
+      return;
+    } else{
+        const hashedPassword = await bcrypt.hash(req.body.password, 10)
+        const newUser = new User({
+          firstName:req.body.firstName,
+          lastName:req.body.lastName,
+          contact:req.body.contact,
+          email:req.body.email,
+          password:hashedPassword,
+          role:req.body.role,
+          isVerified:req.body.isVerified
+        });
+        await newUser.save();
+
+        const token = jwt.sign({userId:newUser._id}, process.env.JWT_SECRET as string, {expiresIn:"1hr"});
+        res.cookie("token",token, {expires:new Date(Date.now() + 1 * 3600000)});
+        res.status(200).json({message:"User created successfully"});
+    }
+  } catch (error) {
+      if(error instanceof Error){
+        console.error(error.message);
+        res.status(400).json({Error: error.message});
+      }
+      else{
+        console.error("An Unknown error from /sign-up")
+      }
+  }
+
+
+})

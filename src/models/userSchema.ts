@@ -41,6 +41,7 @@ const userSchema = new Schema<userProps>({
   },
   isVerified:{
     type:Boolean,
+    default:false
   }
 });
 

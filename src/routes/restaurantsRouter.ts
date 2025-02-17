@@ -20,6 +20,7 @@ resRouter.post("/create", authMiddleware,async (req:CustomReq, res) => {
     })
     if(!resWithContact){
       res.status(404).json({message:"No user found with provided number"});
+      return;
     }
     const restaurant = await Restaurant.findOne({
       contact:req.body.contact,
@@ -44,10 +45,12 @@ resRouter.post("/create", authMiddleware,async (req:CustomReq, res) => {
       if (error instanceof zod.ZodError) {
         console.error(error.message);
         res.status(400).json({ ZodError: error.message });
+        return;
       }
       if (error instanceof Error) {
         console.error(error.message);
         res.status(400).json({ Error: error.message });
+        return;
       } else {
         console.error("An Unknown error from /sign-in");
       }

@@ -6,7 +6,6 @@ import { authMiddleware, CustomReq } from "../middleware/authMiddleWare";
 import { Restaurant } from "../models/restaurantSchema";
 import { resMenuTypes } from "../types/resMenuTypes";
 import { ResMenu } from "../models/restaurantMenuSchema";
-import mongoose from "mongoose";
 
 export const resRouter = express.Router();
 

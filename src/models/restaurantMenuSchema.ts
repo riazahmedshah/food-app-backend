@@ -1,19 +1,19 @@
-import { Model ,Schema, model } from "mongoose";
+import mongoose, { Model ,Schema, model } from "mongoose";
 
 interface resMenuProps extends Document{
-  restaurantId: Schema.Types.ObjectId;
+  resId: mongoose.Types.ObjectId;
   name:string;
   price:number;
   avgStarRating:string;
   image:string;
   description:string;
   cuisines:string[];
-  category:"recomended" | "Break fast" | "Dinner";
+  category:"Recomended" | "Dinner" | "Break fast";
 }
 
 const resMenuSchema = new Schema<resMenuProps>({
-  restaurantId:{
-    type:Schema.Types.ObjectId,
+  resId:{
+    type:mongoose.Schema.Types.ObjectId,
     ref:"Restaurant",
     required:true
   },
@@ -41,10 +41,14 @@ const resMenuSchema = new Schema<resMenuProps>({
   category:{
     type:String,
     enum:{
-      values:["Recomended", "Break fast", "Dinner"],
+      values:["Recomended", "Dinner","Break fast"],
       message:'validator failed  with value `{VALUE}`'
     },
-    default:"recomended"
+    default:"Recomended"
+  },
+  description:{
+    type:String,
+    default:"Default decription of menu"
   }
 });
 

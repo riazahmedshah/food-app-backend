@@ -4,6 +4,9 @@ import zod from "zod"
 import { User } from "../models/userSchema";
 import { authMiddleware, CustomReq } from "../middleware/authMiddleWare";
 import { Restaurant } from "../models/restaurantSchema";
+import { resMenuTypes } from "../types/resMenuTypes";
+import { ResMenu } from "../models/restaurantMenuSchema";
+import mongoose from "mongoose";
 
 export const resRouter = express.Router();
 
@@ -55,5 +58,46 @@ resRouter.post("/create", authMiddleware,async (req:CustomReq, res) => {
         console.error("An Unknown error from /sign-in");
       }
   }
+});
+
+resRouter.post("/addmenu/:resId", authMiddleware, async(req,res) => {
+  const { resId } = req.params;
+  const {success, error} = resMenuTypes.safeParse(req.body);
+  if(!success){
+    res.status(400).json({error});
+    return
+  }
+  try {
+    const restaurant = await Restaurant.findById(resId);
+    if(!restaurant){
+      res.status(404).json({message:"Invalid resId"});
+      return;
+    };
+    const addMenu = new ResMenu({
+      resId,
+      name:req.body.name,
+      price:req.body.price,
+      avgStarRating:req.body.avgStarRating,
+      image:req.body.image,
+      description:req.body.description,
+      category:req.body.category,
+      cuisines:req.body.cuisines
+    });
+    await addMenu.save();
+    res.status(200).json({message:"success"});
+  } catch (error) {
+      if (error instanceof zod.ZodError) {
+        console.error(error.message);
+        res.status(400).json({ ZodError: error.message });
+        return;
+      };
+      if (error instanceof Error) {
+        console.error(error.message);
+        res.status(400).json({ Error: error.message });
+        return;
+      } else {
+        console.error("An Unknown error from /sign-in");
+      }
+  };
 })
 

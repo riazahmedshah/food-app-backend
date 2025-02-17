@@ -23,25 +23,26 @@ resRouter.post("/create", authMiddleware,async (req:CustomReq, res) => {
     if(!resWithContact){
       res.status(404).json({message:"No user found with provided number"});
       return;
-    }
-    const restaurant = await Restaurant.findOne({
-      contact:req.body.contact,
-    });
-    if(restaurant){
-      res.status(409).json({message:"Cannot create two restaurant"});
-      return;
     } else{
-      const newRes = new Restaurant({
+      const restaurant = await Restaurant.findOne({
         contact:req.body.contact,
-        name:req.body.name,
-        image:req.body.image,
-        cuisines:req.body.cuisines,
-        avgStarRatings:req.body.avgStarRatings,
-        address:req.body.address,
-        totalOutlets:req.body.totalOutlets
+      });
+      if(restaurant){
+        res.status(409).json({message:"Cannot create two restaurant"});
+        return;
+      } else{
+        const newRes = new Restaurant({
+          contact:req.body.contact,
+          name:req.body.name,
+          image:req.body.image,
+          cuisines:req.body.cuisines,
+          avgStarRatings:req.body.avgStarRatings,
+          address:req.body.address,
+          totalOutlets:req.body.totalOutlets
       });
       await newRes.save();
       res.status(200).json({message:"success"});
+      }
     }
   } catch (error) {
       if (error instanceof zod.ZodError) {
@@ -98,5 +99,14 @@ resRouter.post("/addmenu/:resId", authMiddleware, async(req,res) => {
         console.error("An Unknown error from /sign-in");
       }
   };
-})
+});
+
+resRouter.get("/all", async(req, res) => {
+  try {
+    const resList = await Restaurant.find({}).select(["name","image","cuisines","avgStarRatings","address","totalOutlets"]);
+    res.status(200).json({resList});
+  } catch (error) {
+    console.error(error)
+  }
+});
 

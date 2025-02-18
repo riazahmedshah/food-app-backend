@@ -9,11 +9,11 @@ import { ResMenu } from "../models/restaurantMenuSchema";
 import { editResTypes } from "../types/editResTypes";
 import { handleError } from "../utils/errorfunction";
 import { editMenuTypes } from "../types/editMenuTypes";
+import { checkUserRole } from "../utils/checkUserRole";
 
 export const resRouter = express.Router();
 
 resRouter.post("/create", authMiddleware,async (req:CustomReq, res) => {
-  const userId = req.decode?.userId
   const {success, error} = resTypes.safeParse(req.body);
   if(!success){
     res.status(400).json({error});
@@ -61,8 +61,14 @@ resRouter.patch("/edit-res", authMiddleware,async(req:CustomReq,res) => {
   }
   try {
     const user = await User.findById(userId);
+    if(!user){
+      res.status(404).json({message:"not found"})
+    }
+    /****/
+    const isUserPartner = await checkUserRole(userId,res,"partner");
+    if(!isUserPartner) return;
+    /****/
     const contact = user?.contact;
-    //console.log(contact);
     const restaurant = await Restaurant.findOneAndUpdate({contact},{
       name:req.body.name,
       image:req.body.image,
@@ -77,7 +83,8 @@ resRouter.patch("/edit-res", authMiddleware,async(req:CustomReq,res) => {
   }
 })
 
-resRouter.post("/addmenu/:resId", authMiddleware, async(req,res) => {
+resRouter.post("/addmenu/:resId", authMiddleware, async(req:CustomReq,res) => {
+  const userId = req.decode?.userId;
   const { resId } = req.params;
   const {success, error} = resMenuTypes.safeParse(req.body);
   if(!success){
@@ -85,6 +92,9 @@ resRouter.post("/addmenu/:resId", authMiddleware, async(req,res) => {
     return
   }
   try {
+    const isUserPartner = await checkUserRole(userId,res,"partner");
+    if(!isUserPartner) return;
+    /*****/
     const restaurant = await Restaurant.findById(resId);
     if(!restaurant){
       res.status(404).json({message:"Invalid resId"});
@@ -107,7 +117,8 @@ resRouter.post("/addmenu/:resId", authMiddleware, async(req,res) => {
   };
 });
 
-resRouter.patch("/edit-menu/:menuId", authMiddleware,async(req, res) => {
+resRouter.patch("/edit-menu/:menuId", authMiddleware,async(req:CustomReq, res) => {
+  const userId = req.decode?.userId;
   const {menuId} = req.params;
   const {success, error} = editMenuTypes.safeParse(req.body);
   if(!success){
@@ -115,6 +126,8 @@ resRouter.patch("/edit-menu/:menuId", authMiddleware,async(req, res) => {
     return;
   }
   try {
+    const isUserPartner = await checkUserRole(userId,res,"partner");
+    if(!isUserPartner) return;
     const oneMenu = await ResMenu.findByIdAndUpdate(menuId,{
       name:req.body.name,
       image:req.body.image,

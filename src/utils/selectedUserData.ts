@@ -1,0 +1,1 @@
+export const USER_DATA = ["firstName","lastName","email","role","contact"]

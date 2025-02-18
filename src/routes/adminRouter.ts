@@ -5,6 +5,7 @@ import { handleError } from "../utils/errorfunction";
 import { editUserTypes } from "../types/editUserTypes";
 import { Restaurant } from "../models/restaurantSchema";
 import { checkUserRole } from "../utils/checkUserRole";
+import { USER_DATA } from "../utils/selectedUserData";
 
 export const adminRouter = express.Router();
 
@@ -39,9 +40,10 @@ adminRouter.patch("/approve/:reqUserId", authMiddleware, async (req: CustomReq, 
 
         const updatedUserRole = await User.findByIdAndUpdate(reqUserId, {
             role: req.body.role,
-        }, { returnDocument: "after" });
+            isVerified:true
+        });
 
-        res.status(200).json({ message: "approved", updatedUserRole });
+        res.status(200).json({ message: "approved" });
     } catch (error) {
         handleError(res, error);
     }

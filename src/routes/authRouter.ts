@@ -4,7 +4,6 @@ import { User } from "../models/userSchema";
 import bcrypt from "bcryptjs"
 import  jwt  from "jsonwebtoken";
 import { signinType } from "../types/signinTypes";
-import zod from "zod"
 import { handleError } from "../utils/errorfunction";
 
 export const authRouter = express.Router();

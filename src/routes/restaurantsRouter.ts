@@ -8,6 +8,7 @@ import { resMenuTypes } from "../types/resMenuTypes";
 import { ResMenu } from "../models/restaurantMenuSchema";
 import { editResTypes } from "../types/editResTypes";
 import { handleError } from "../utils/errorfunction";
+import { editMenuTypes } from "../types/editMenuTypes";
 
 export const resRouter = express.Router();
 
@@ -51,12 +52,12 @@ resRouter.post("/create", authMiddleware,async (req:CustomReq, res) => {
   }
 });
 
-resRouter.patch("/edit", authMiddleware,async(req:CustomReq,res) => {
+resRouter.patch("/edit-res", authMiddleware,async(req:CustomReq,res) => {
   const userId = req.decode?.userId;
   const {success, error} = editResTypes.safeParse(req.body);
   if(!success){
     res.status(400).json({error});
-    return
+    return;
   }
   try {
     const user = await User.findById(userId);
@@ -106,6 +107,30 @@ resRouter.post("/addmenu/:resId", authMiddleware, async(req,res) => {
   };
 });
 
+resRouter.patch("/edit-menu/:menuId", authMiddleware,async(req, res) => {
+  const {menuId} = req.params;
+  const {success, error} = editMenuTypes.safeParse(req.body);
+  if(!success){
+    res.status(400).json({error});
+    return;
+  }
+  try {
+    const oneMenu = await ResMenu.findByIdAndUpdate(menuId,{
+      name:req.body.name,
+      image:req.body.image,
+      cuisines:req.body.cuisines,
+      avgStarRating:req.body.avgStarRating,
+      price:req.body.price,
+      description:req.body.description,
+      category:req.body.category,
+    },{returnDocument:"after"});
+    res.status(200).json({oneMenu});
+
+  } catch (error) {
+    handleError(res, error);
+  }
+})
+
 resRouter.get("/all", async(req, res) => {
   try {
     const resList = await Restaurant.find({}).select(["name","image","cuisines","avgStarRatings","address","totalOutlets"]);
@@ -114,4 +139,14 @@ resRouter.get("/all", async(req, res) => {
     handleError(res, error);
   }
 });
+
+resRouter.get("/:resId",async (req,res) => {
+  const {resId} = req.params;
+  try {
+    const menu = await ResMenu.find({resId});
+    res.status(200).json({menu});
+  } catch (error) {
+    handleError(res, error);
+  }
+})
 

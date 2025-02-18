@@ -38,7 +38,7 @@ const userSchema = new Schema<userProps>({
   role:{
     type:String,
     enum:{
-      values:["user","partner"],
+      values:["user","partner","admin"],
       message:'validator failed  with value `{VALUE}`'
     },
     default:"user"

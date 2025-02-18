@@ -5,6 +5,6 @@ export const signupTypes = z.object({
   email: z.string().email("provide valid email").trim().toLowerCase(),
   contact: z.string().min(10, "mobile number must be 10 digits").max(10,"mobile number must be 10 digits"),
   password: z.string().min(6,"Password must have six characters"),
-  role:z.enum(["user","partner"]).optional(),
+  role:z.enum(["user","partner","admin"]).optional(),
   isVerified:z.boolean().optional(),
 })

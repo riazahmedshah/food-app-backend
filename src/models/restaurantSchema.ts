@@ -14,7 +14,8 @@ const resSchema = new Schema<resProps>({
   contact: { 
     type: Schema.Types.String, 
     ref: 'Signup', 
-    required: true
+    required: true,
+    unique:true
   },
   name:{
     type:String,

@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs"
 import  jwt  from "jsonwebtoken";
 import { signinType } from "../types/signinTypes";
 import zod from "zod"
+import { handleError } from "../utils/errorfunction";
 
 export const authRouter = express.Router();
 
@@ -78,17 +79,7 @@ authRouter.post("/signin", async(req, res) => {
       res.status(404).json({message:"User not found"})
     }
   } catch (error) {
-    if(error instanceof zod.ZodError){
-      console.error(error.message);
-      res.status(400).json({ZodError: error.message});
-    }
-      if(error instanceof Error){
-        console.error(error.message);
-        res.status(400).json({Error: error.message});
-      }
-      else{
-        console.error("An Unknown error from /sign-in")
-      }
+    handleError(res, error);
   }
 });
 

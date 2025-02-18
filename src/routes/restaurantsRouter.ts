@@ -47,18 +47,7 @@ resRouter.post("/create", authMiddleware,async (req:CustomReq, res) => {
       }
     }
   } catch (error) {
-      if (error instanceof zod.ZodError) {
-        console.error(error.message);
-        res.status(400).json({ ZodError: error.message });
-        return;
-      }
-      if (error instanceof Error) {
-        console.error(error.message);
-        res.status(400).json({ Error: error.message });
-        return;
-      } else {
-        console.error("An Unknown error from /sign-in");
-      }
+      handleError(res, error);
   }
 });
 
@@ -113,18 +102,7 @@ resRouter.post("/addmenu/:resId", authMiddleware, async(req,res) => {
     await addMenu.save();
     res.status(200).json({message:"success"});
   } catch (error) {
-      if (error instanceof zod.ZodError) {
-        console.error(error.message);
-        res.status(400).json({ ZodError: error.message });
-        return;
-      };
-      if (error instanceof Error) {
-        console.error(error.message);
-        res.status(400).json({ Error: error.message });
-        return;
-      } else {
-        console.error("An Unknown error from /sign-in");
-      }
+      handleError(res,error);
   };
 });
 
@@ -133,7 +111,7 @@ resRouter.get("/all", async(req, res) => {
     const resList = await Restaurant.find({}).select(["name","image","cuisines","avgStarRatings","address","totalOutlets"]);
     res.status(200).json({resList});
   } catch (error) {
-    console.error(error)
+    handleError(res, error);
   }
 });
 

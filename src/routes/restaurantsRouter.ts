@@ -6,6 +6,8 @@ import { authMiddleware, CustomReq } from "../middleware/authMiddleWare";
 import { Restaurant } from "../models/restaurantSchema";
 import { resMenuTypes } from "../types/resMenuTypes";
 import { ResMenu } from "../models/restaurantMenuSchema";
+import { editResTypes } from "../types/editResTypes";
+import { handleError } from "../utils/errorfunction";
 
 export const resRouter = express.Router();
 
@@ -59,6 +61,31 @@ resRouter.post("/create", authMiddleware,async (req:CustomReq, res) => {
       }
   }
 });
+
+resRouter.patch("/edit", authMiddleware,async(req:CustomReq,res) => {
+  const userId = req.decode?.userId;
+  const {success, error} = editResTypes.safeParse(req.body);
+  if(!success){
+    res.status(400).json({error});
+    return
+  }
+  try {
+    const user = await User.findById(userId);
+    const contact = user?.contact;
+    //console.log(contact);
+    const restaurant = await Restaurant.findOneAndUpdate({contact},{
+      name:req.body.name,
+      image:req.body.image,
+      cuisines:req.body.cuisines,
+      avgStarRating:req.body.avgStarRating,
+      address:req.body.address,
+      totalOutlets:req.body.totalOutlet
+    },{returnDocument:"after"});
+    res.status(200).json({restaurant});
+  } catch (error) {
+    handleError(res,error);
+  }
+})
 
 resRouter.post("/addmenu/:resId", authMiddleware, async(req,res) => {
   const { resId } = req.params;

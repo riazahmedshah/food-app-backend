@@ -1,4 +1,4 @@
-import { Response } from "express-serve-static-core";
+import { Response } from "express";
 import { Types } from "mongoose";
 import { User } from "../models/userSchema"
 

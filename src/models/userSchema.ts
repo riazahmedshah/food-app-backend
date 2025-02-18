@@ -6,7 +6,7 @@ interface userProps extends Document{
   email:string;
   contact:string;
   password:string;
-  role: "user" | "partner";
+  role: "user" | "partner" | "admin";
   isVerified:boolean;
 }
 

@@ -41,13 +41,7 @@ authRouter.post("/signup", async(req,res) => {
         res.status(200).json({message:"success"});
     }
   } catch (error) {
-      if(error instanceof Error){
-        console.error(error.message);
-        res.status(400).json({Error: error.message});
-      }
-      else{
-        console.error("An Unknown error from /sign-up")
-      }
+      handleError(res, error);
   }
 
 
